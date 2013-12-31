@@ -15,8 +15,10 @@ http://www.erh.noaa.gov/okx/climate/records/monthannualtemp.html
 
 ```r
 inputPath <- "./CentralPark/Data/Derived/CentralParkTemp.csv"
-changeMonths <- c(as.Date("1900-01-15"), as.Date("1950-01-15"), as.Date("2000-01-15"))
-changeLabels <- c("1900", "1950", "2000")
+# changeMonths <- c(as.Date("1900-01-15"), as.Date("1950-01-15"), as.Date("2000-01-15"))
+# changeLabels <- c("1900", "1950", "2000")
+changeMonths <- c(as.Date("1900-01-15"), as.Date("1950-01-15"))
+changeLabels <- c("1900", "1950")
 
 vpLayout <- function(x, y) { grid::viewport(layout.pos.row=x, layout.pos.col=y) }
 
@@ -62,8 +64,10 @@ dateSequence <- base::as.Date(c("1870-01-01","1880-01-01","1890-01-01",
 xScale       <- ggplot2::scale_x_date(breaks=dateSequence, labels=scales::date_format("%Y"))
 xScaleBlank  <- ggplot2::scale_x_date(breaks=dateSequence, labels=NULL) #This keeps things proportional down the three frames.
 
-paletteDark <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(2L,4L,6L,8L)][c(1, 2, 4, 3)]
-paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c(1, 2, 4, 3)]
+# paletteDark <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(2L,4L,6L,8L)][c(1, 2, 4, 3)]
+# paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c(1, 2, 4, 3)]
+paletteDark <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(2L,4L,6L,8L)][c(1, 2, 4)]
+paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c(1, 2, 4)]
     
 ```
 
@@ -74,6 +78,7 @@ paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c
 dsLinear <- utils::read.csv(inputPath, stringsAsFactors=FALSE)
 dsLinear <- dsLinear[dsLinear$Year <= 2012L, ] #The 2013 year is missing
 dsLinear$StageID <- dsLinear$CenturyHalfID
+dsLinear$StageID <- ifelse(dsLinear$StageID==4L, 3L, dsLinear$StageID)
 dsLinear$Date <- base::as.Date(dsLinear$Date)
 # sapply(dsLinear, class)
 ```
@@ -211,14 +216,6 @@ portfolioPolar <- Wats::PolarizeCartesian(
   plottedPointCountPerCycle = 7200,
   graphFloor = 20
 )
-```
-
-```
-[1] 10 20 30 40 50 60 70 80 90
-[1] 20
-```
-
-```r
 
 dsO <- portfolioPolar$dsObservedPolar
 dsS <- portfolioPolar$dsStageCyclePolar
@@ -262,16 +259,6 @@ topLeftPanel <- Wats::PolarPeriodic(
   paletteDark = grDevices::adjustcolor(paletteDark, alpha.f=.2),
   paletteLight = grDevices::adjustcolor(paletteLight, alpha.f=.2)
 )
-```
-
-```
-[1] 20 40 60 80
-[1]  0 20 40 60
-[1] 20
-[1] 80
-```
-
-```r
 grid::upViewport()
 
 ## Create top right panel
@@ -288,16 +275,6 @@ topRighttPanel <- Wats::PolarPeriodic(
   paletteLight = paletteLight, 
   originLabel = NULL
 )
-```
-
-```
-[1] 20 40 60 80
-[1]  0 20 40 60
-[1] 20
-[1] 80
-```
-
-```r
 grid::upViewport()
 
 ## Create bottom panel
@@ -362,22 +339,22 @@ glm(formula = y ~ 1 + step + y1, data = dsClassic)
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--1.0417  -0.1709   0.0055   0.1756   1.1542  
+-1.0393  -0.1725   0.0043   0.1756   1.1528  
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  1.24618    0.28131    4.43    1e-05 ***
-step         0.02952    0.00999    2.95   0.0032 ** 
-y1           0.97621    0.00538  181.42   <2e-16 ***
+(Intercept)  1.23187    0.28123    4.38  1.3e-05 ***
+step         0.03360    0.01167    2.88    0.004 ** 
+y1           0.97643    0.00539  181.02  < 2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-(Dispersion parameter for gaussian family taken to be 0.07717)
+(Dispersion parameter for gaussian family taken to be 0.07719)
 
     Null deviance: 4824.91  on 1714  degrees of freedom
-Residual deviance:  132.12  on 1712  degrees of freedom
+Residual deviance:  132.15  on 1712  degrees of freedom
   (12 observations deleted due to missingness)
-AIC: 478.6
+AIC: 479.1
 
 Number of Fisher Scoring iterations: 2
 ```
@@ -404,21 +381,21 @@ glm(formula = y ~ 1 + step + y1, data = dsLoess)
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--0.7500  -0.1404   0.0037   0.1433   0.6869  
+-0.7468  -0.1384   0.0026   0.1423   0.6866  
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  0.71114    0.21615    3.29    0.001 ** 
-step         0.01485    0.00761    1.95    0.051 .  
-y1           0.98645    0.00413  238.59   <2e-16 ***
+(Intercept)  0.74382    0.21564    3.45  0.00058 ***
+step         0.01956    0.00891    2.19  0.02833 *  
+y1           0.98576    0.00414  238.34  < 2e-16 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-(Dispersion parameter for gaussian family taken to be 0.04513)
+(Dispersion parameter for gaussian family taken to be 0.0451)
 
     Null deviance: 4834.202  on 1726  degrees of freedom
-Residual deviance:   77.804  on 1724  degrees of freedom
-AIC: -444.6
+Residual deviance:   77.758  on 1724  degrees of freedom
+AIC: -445.6
 
 Number of Fisher Scoring iterations: 2
 ```
@@ -430,7 +407,7 @@ The current vignette was build on a system using the following software.
 
 
 ```
-Report created by Will at 12/31/2013 1:10:42 PM, CST
+Report created by Will at 12/31/2013 2:28:39 PM, CST
 ```
 
 ```

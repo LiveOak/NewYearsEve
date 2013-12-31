@@ -41,8 +41,10 @@ if( base::Sys.info()["sysname"] == "Windows" )
 
 ```{r Definitions}
 inputPath <- "./CentralPark/Data/Derived/CentralParkTemp.csv"
-changeMonths <- c(as.Date("1900-01-15"), as.Date("1950-01-15"), as.Date("2000-01-15"))
-changeLabels <- c("1900", "1950", "2000")
+# changeMonths <- c(as.Date("1900-01-15"), as.Date("1950-01-15"), as.Date("2000-01-15"))
+# changeLabels <- c("1900", "1950", "2000")
+changeMonths <- c(as.Date("1900-01-15"), as.Date("1950-01-15"))
+changeLabels <- c("1900", "1950")
 
 vpLayout <- function(x, y) { grid::viewport(layout.pos.row=x, layout.pos.col=y) }
 
@@ -88,8 +90,10 @@ dateSequence <- base::as.Date(c("1870-01-01","1880-01-01","1890-01-01",
 xScale       <- ggplot2::scale_x_date(breaks=dateSequence, labels=scales::date_format("%Y"))
 xScaleBlank  <- ggplot2::scale_x_date(breaks=dateSequence, labels=NULL) #This keeps things proportional down the three frames.
 
-paletteDark <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(2L,4L,6L,8L)][c(1, 2, 4, 3)]
-paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c(1, 2, 4, 3)]
+# paletteDark <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(2L,4L,6L,8L)][c(1, 2, 4, 3)]
+# paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c(1, 2, 4, 3)]
+paletteDark <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(2L,4L,6L,8L)][c(1, 2, 4)]
+paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c(1, 2, 4)]
     
 ```
 
@@ -98,6 +102,7 @@ paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c
 dsLinear <- utils::read.csv(inputPath, stringsAsFactors=FALSE)
 dsLinear <- dsLinear[dsLinear$Year <= 2012L, ] #The 2013 year is missing
 dsLinear$StageID <- dsLinear$CenturyHalfID
+dsLinear$StageID <- ifelse(dsLinear$StageID==4L, 3L, dsLinear$StageID)
 dsLinear$Date <- base::as.Date(dsLinear$Date)
 # sapply(dsLinear, class)
 ```
