@@ -61,6 +61,10 @@ dateSequence <- base::as.Date(c("1870-01-01","1880-01-01","1890-01-01",
                               "2000-01-01","2010-01-01"))
 xScale       <- ggplot2::scale_x_date(breaks=dateSequence, labels=scales::date_format("%Y"))
 xScaleBlank  <- ggplot2::scale_x_date(breaks=dateSequence, labels=NULL) #This keeps things proportional down the three frames.
+
+paletteDark <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(2L,4L,6L,8L)][c(1, 2, 4, 3)]
+paletteLight <- RColorBrewer::brewer.pal(n=10L, name="Paired")[c(1L,3L,5L,7L)][c(1, 2, 4, 3)]
+    
 ```
 
 
@@ -101,7 +105,10 @@ topPanel <- Wats::CartesianRolling(
   changePointLabels = changeLabels,
   yTitle = "Mean Monthly Temp",
   drawRollingBand = FALSE,
-  drawRollingLine = FALSE
+  drawRollingLine = FALSE,
+  drawSparseLineAndPoints = FALSE,
+  paletteDark = paletteDark,
+  paletteLight = paletteLight
 )
 
 middlePanel <- CartesianRolling(
@@ -113,7 +120,10 @@ middlePanel <- CartesianRolling(
   changePointLabels = changeLabels,
   yTitle = "Mean Monthly Temp",
   drawRollingBand = FALSE, 
-  drawJaggedLine = FALSE
+  drawJaggedLine = FALSE,
+  drawSparseLineAndPoints = FALSE,
+  paletteDark = paletteDark,
+  paletteLight = paletteLight
 )
 
 bottomPanel <- Wats::CartesianRolling(
@@ -124,7 +134,10 @@ bottomPanel <- Wats::CartesianRolling(
   changePoints = changeMonths, 
   yTitle = "Mean Monthly Temp", 
   changePointLabels = changeLabels, 
-  drawJaggedLine = FALSE
+  drawJaggedLine = FALSE,
+  drawSparseLineAndPoints = FALSE,
+  paletteDark = paletteDark,
+  paletteLight = paletteLight
 )
 
 topPanel <- topPanel + xScale + darkTheme
@@ -172,6 +185,8 @@ cartesianPeriodic <- Wats::CartesianPeriodic(
   changePoints = changeMonths, 
   changePointLabels = changeLabels,
   yTitle = "Mean Monthly Temp",
+  paletteDark = paletteDark,
+  paletteLight = paletteLight,
   drawPeriodicBand = TRUE #The only difference from the simple linear graph above
 )
 cartesianPeriodic <- cartesianPeriodic + xScale + darkTheme 
@@ -193,8 +208,31 @@ portfolioPolar <- Wats::PolarizeCartesian(
   dsStageCycle = portfolioCartesian$dsStageCycle, 
   yName = "Temp", 
   stageIDName = "StageID", 
-  plottedPointCountPerCycle = 7200
+  plottedPointCountPerCycle = 7200,
+  graphFloor = 20
 )
+```
+
+```
+[1] 10 20 30 40 50 60 70 80 90
+[1] 20
+```
+
+```r
+
+dsO <- portfolioPolar$dsObservedPolar
+dsS <- portfolioPolar$dsStageCyclePolar
+# 
+min(dsO$Radius)
+```
+
+```
+[1] 20.53
+```
+
+```r
+# dsS[which.min(dsO$Radius), ]
+
 
 grid::grid.newpage()
 grid::pushViewport(grid::viewport(
@@ -206,16 +244,34 @@ grid::pushViewport(grid::viewport(
   gp = grid::gpar(cex=1, fill=NA)
 ))
 
+graphFloor <- 20
+graphCeiling <- 80
+tickLocations <- seq(from=graphFloor, to=graphCeiling, by=20)
+  
 ## Create top left panel
 grid::pushViewport(grid::viewport(layout.pos.col=1, layout.pos.row=1))
-topLeftPanel <- Wats::PolarPeriodic(drawRadiusLabels=TRUE,
+topLeftPanel <- Wats::PolarPeriodic(
   dsLinear = portfolioPolar$dsObservedPolar, 
   dsStageCyclePolar = portfolioPolar$dsStageCyclePolar, 
   yName = "Radius", 
   stageIDName = "StageID",
   drawPeriodicBand = FALSE,
-  cardinalLabels = c("Jan1", "Apr1", "July1", "Oct1")
+  drawRadiusLabels = TRUE,
+  tickLocations = tickLocations,
+  cardinalLabels = c("Jan1", "Apr1", "July1", "Oct1"),
+  paletteDark = grDevices::adjustcolor(paletteDark, alpha.f=.2),
+  paletteLight = grDevices::adjustcolor(paletteLight, alpha.f=.2)
 )
+```
+
+```
+[1] 20 40 60 80
+[1]  0 20 40 60
+[1] 20
+[1] 80
+```
+
+```r
 grid::upViewport()
 
 ## Create top right panel
@@ -226,9 +282,22 @@ topRighttPanel <- Wats::PolarPeriodic(
   yName = "Radius", 
   stageIDName = "StageID",
   drawObservedLine = FALSE,
-  cardinalLabels = c("Jan1", "Apr1", "July1", "Oct1"), 
+  tickLocations = tickLocations,
+  cardinalLabels = c("Jan1", "Apr1", "July1", "Oct1"),
+  paletteDark = paletteDark,
+  paletteLight = paletteLight, 
   originLabel = NULL
 )
+```
+
+```
+[1] 20 40 60 80
+[1]  0 20 40 60
+[1] 20
+[1] 80
+```
+
+```r
 grid::upViewport()
 
 ## Create bottom panel
@@ -361,7 +430,7 @@ The current vignette was build on a system using the following software.
 
 
 ```
-Report created by Will at 12/31/2013 12:15:48 PM, CST
+Report created by Will at 12/31/2013 1:10:42 PM, CST
 ```
 
 ```
